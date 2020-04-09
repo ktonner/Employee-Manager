@@ -55,4 +55,3 @@ function addD(){
 })
 }
 
-module.exports = Add
