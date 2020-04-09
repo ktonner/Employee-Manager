@@ -95,12 +95,12 @@ function addD(){
         }
     ]).then(response => {
         //construct the new department
-        //newDep(depname.name)
+        var depname = response.depname
         //connect to the server and push the new department to the table
         connection.query(
             "INSERT INTO department SET ?",
               {
-                name: depname.name
+                name: depname
               },
           
             function(err, res) {
