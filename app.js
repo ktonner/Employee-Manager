@@ -130,6 +130,7 @@ function addD() {
 function addR() {
     //Query to get all of the departments for the department question
     connection.query("SELECT * FROM department", function (err, res) {
+        console.log(res)
         if (err) throw err;
         inquirer.prompt([
             {
@@ -145,14 +146,14 @@ function addR() {
             {
                 type: "rawlist",
                 message: "Pick the department for this role.",
-                name: "department",
                 choices: function () {
                     var choiceArray = []
                     for (i = 0; i < res.length; i++) {
-                        choiceArray.push(res[i].item_name)
+                        choiceArray.push(res[i].name)
                     }
                     return choiceArray
-                }
+                },
+                name: "department"
             }
     ]).then(answers=>{
         //push the new role into the database!
@@ -170,7 +171,8 @@ function addR() {
             })
 
     })
-    }
+    })
+}
 
 
 //Start the app!
