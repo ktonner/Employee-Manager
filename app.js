@@ -99,7 +99,7 @@ function init() {
 
 //QUESTION PATHS
 
-//DEPARTMENT
+//ADD DEPARTMENT
 //Ask for name, then make new dep object
 function addD() {
     inquirer.prompt([
@@ -125,54 +125,113 @@ function addD() {
     })
 }
 
-//ROLE
-//ask for department id, then create role
-function addR() {
-    //Query to get all of the departments for the department question
-    connection.query("SELECT * FROM department", function (err, res) {
-        console.log(res)
+//ADD EMPLOYEE
+//ask for first and last name, then enter role id
+function addE() {
+    //Query to get all of the roles for the role question
+    connection.query("SELECT * FROM role", function (err, res) {
         if (err) throw err;
         inquirer.prompt([
             {
                 type: "input",
-                message: "What is the title of this role?",
-                name: "title"
+                message: "Enter the employee's first name.",
+                name: "firstname"
             },
             {
                 type: "input",
-                message: "What salary should this role have?",
-                name: "salary"
+                message: "Enter the employee's last name.",
+                name: "lastname"
             },
             {
                 type: "rawlist",
-                message: "Pick the department for this role.",
+                message: "Select a role for this employee.",
                 choices: function () {
                     var choiceArray = []
                     for (i = 0; i < res.length; i++) {
-                        choiceArray.push(res[i].name)
+                        choiceArray.push(res[i].title)
                     }
                     return choiceArray
                 },
-                name: "department"
+                name: "role"
             }
-    ]).then(answers=>{
-        //push the new role into the database!
-        connection.query(
-            "INSERT INTO role SET ?",
-            {
-                title: answers.title,
-                salary: answers.salary,
-                department_id: answers.department.id
-            },
+        ]).then(answers => {
+            //connect the role from answers to the one from the database to get the id
+            for (i = 0; i < res.length; i++) {
+                if (res[i].title == answers.role) {
+                    var roleID = res[i].id
+                }
+            }
+            //push the new employee into the database!
+            connection.query(
+                "INSERT INTO employee SET ?",
+                {
+                    first_name: answers.firstname,
+                    last_name: answers.lastname,
+                    role_id: roleID
+                },
 
-            function (err, res) {
-                if (err) throw err;
-                console.log(res.affectedRows + " database updated!\n");
-            })
-
-    })
+                function (err, res) {
+                    if (err) throw err;
+                    console.log(res.affectedRows + " database updated!\n");
+                })
+        })
     })
 }
+
+//ADD ROLE
+//ask for department id, then create role
+function addR() {
+            //Query to get all of the departments for the department question
+            connection.query("SELECT * FROM department", function (err, res) {
+                console.log(res)
+                if (err) throw err;
+                inquirer.prompt([
+                    {
+                        type: "input",
+                        message: "What is the title of this role?",
+                        name: "title"
+                    },
+                    {
+                        type: "input",
+                        message: "What salary should this role have?",
+                        name: "salary"
+                    },
+                    {
+                        type: "rawlist",
+                        message: "Pick the department for this role.",
+                        choices: function () {
+                            var choiceArray = []
+                            for (i = 0; i < res.length; i++) {
+                                choiceArray.push(res[i].name)
+                            }
+                            return choiceArray
+                        },
+                        name: "department"
+                    }
+                ]).then(answers => {
+                    //connect the Department id from answers to the one from the database
+                    for (i = 0; i < res.length; i++) {
+                        if (res[i].name == answers.department) {
+                            var depID = res[i].id
+                        }
+                    }
+                    //push the new role into the database!
+                    connection.query(
+                        "INSERT INTO role SET ?",
+                        {
+                            title: answers.title,
+                            salary: answers.salary,
+                            department_id: depID
+                        },
+
+                        function (err, res) {
+                            if (err) throw err;
+                            console.log(res.affectedRows + " database updated!\n");
+                        })
+
+                })
+            })
+        }
 
 
 //Start the app!
