@@ -50,8 +50,6 @@ function init() {
                     "Add a department",
                     "Add an employee",
                     "Add a role",
-                    "Update an employee",
-                    "Update a role",
                     "Update an employee's role",
                     "View departments",
                     "View employees",
@@ -70,17 +68,11 @@ function init() {
         else if (answer.start == "Add a role") {
             addR()
         }
-        else if (answer.start == "Update an employee") {
-
-        }
-        else if (answer.start == "Update a role") {
-
-        }
         else if (answer.start == "Update an employee's role") {
-
+            upE()
         }
         else if (answer.start == "View departments") {
-
+            viewD()
         }
         else if (answer.start == "View employees") {
             viewE()
@@ -115,27 +107,28 @@ function addD() {
             },
 
             function (err, res) {
-                if (err) throw err;})
-                inquirer.prompt([
-                    {
-                        type:"list",
-                        message:"Would you like to do something else?",
-                        name: "restart",
-                        choices:[
-                            "Yes",
-                            "No"
-                        ]
-                }
-                ]).then(a=>{
-                    if(a.restart == "Yes"){
-                        init()
-                    }
-                    else{
-                        connection.end
-                    } 
-                })
+                if (err) throw err;
             })
-    }
+        inquirer.prompt([
+            {
+                type: "list",
+                message: "Would you like to do something else?",
+                name: "restart",
+                choices: [
+                    "Yes",
+                    "No"
+                ]
+            }
+        ]).then(a => {
+            if (a.restart == "Yes") {
+                init()
+            }
+            else {
+                connection.end
+            }
+        })
+    })
+}
 
 //ADD EMPLOYEE
 //ask for first and last name, then enter role id
@@ -183,162 +176,250 @@ function addE() {
                 },
 
                 function (err, res) {
-                    if (err) throw err;})
-                    inquirer.prompt([
-                        {
-                            type:"list",
-                            message:"Would you like to do something else?",
-                            name: "restart",
-                            choices:[
-                                "Yes",
-                                "No"
-                            ]
-                    }
-                    ]).then(a=>{
-                        if(a.restart == "Yes"){
-                            init()
-                        }
-                        else{
-                            connection.end
-                        } 
-                    })
+                    if (err) throw err;
                 })
+            inquirer.prompt([
+                {
+                    type: "list",
+                    message: "Would you like to do something else?",
+                    name: "restart",
+                    choices: [
+                        "Yes",
+                        "No"
+                    ]
+                }
+            ]).then(a => {
+                if (a.restart == "Yes") {
+                    init()
+                }
+                else {
+                    connection.end
+                }
+            })
         })
-    }
+    })
+}
 
 //ADD ROLE
 //ask for department id, then create role
 function addR() {
-            //Query to get all of the departments for the department question
-            connection.query("SELECT * FROM department", function (err, res) {
-                console.log(res)
-                if (err) throw err;
-                inquirer.prompt([
-                    {
-                        type: "input",
-                        message: "What is the title of this role?",
-                        name: "title"
-                    },
-                    {
-                        type: "input",
-                        message: "What salary should this role have?",
-                        name: "salary"
-                    },
-                    {
-                        type: "rawlist",
-                        message: "Pick the department for this role.",
-                        choices: function () {
-                            var choiceArray = []
-                            for (i = 0; i < res.length; i++) {
-                                choiceArray.push(res[i].name)
-                            }
-                            return choiceArray
-                        },
-                        name: "department"
-                    }
-                ]).then(answers => {
-                    //connect the Department id from answers to the one from the database
+    //Query to get all of the departments for the department question
+    connection.query("SELECT * FROM department", function (err, res) {
+        console.log(res)
+        if (err) throw err;
+        inquirer.prompt([
+            {
+                type: "input",
+                message: "What is the title of this role?",
+                name: "title"
+            },
+            {
+                type: "input",
+                message: "What salary should this role have?",
+                name: "salary"
+            },
+            {
+                type: "rawlist",
+                message: "Pick the department for this role.",
+                choices: function () {
+                    var choiceArray = []
                     for (i = 0; i < res.length; i++) {
-                        if (res[i].name == answers.department) {
-                            var depID = res[i].id
-                        }
+                        choiceArray.push(res[i].name)
                     }
-                    //push the new role into the database!
-                    connection.query(
-                        "INSERT INTO role SET ?",
-                        {
-                            title: answers.title,
-                            salary: answers.salary,
-                            department_id: depID
-                        },
+                    return choiceArray
+                },
+                name: "department"
+            }
+        ]).then(answers => {
+            //connect the Department id from answers to the one from the database
+            for (i = 0; i < res.length; i++) {
+                if (res[i].name == answers.department) {
+                    var depID = res[i].id
+                }
+            }
+            //push the new role into the database!
+            connection.query(
+                "INSERT INTO role SET ?",
+                {
+                    title: answers.title,
+                    salary: answers.salary,
+                    department_id: depID
+                },
 
-                        function (err, res) {
-                            if (err) throw err;
-                        })
-                    inquirer.prompt([
-                        {
-                            type:"list",
-                            message:"Would you like to do something else?",
-                            name: "restart",
-                            choices:[
-                                "Yes",
-                                "No"
-                            ]
-                    }
-                    ]).then(a=>{
-                        if(a.restart == "Yes"){
-                            init()
-                        }
-                        else{
-                            connection.end
-                        } 
-                    })
-
+                function (err, res) {
+                    if (err) throw err;
                 })
+            inquirer.prompt([
+                {
+                    type: "list",
+                    message: "Would you like to do something else?",
+                    name: "restart",
+                    choices: [
+                        "Yes",
+                        "No"
+                    ]
+                }
+            ]).then(a => {
+                if (a.restart == "Yes") {
+                    init()
+                }
+                else {
+                    connection.end
+                }
             })
-        }
+
+        })
+    })
+}
 
 //UPDATE EMPLOYEE
 
 //VIEW EMPLOYEES
-function viewE(){
+function viewE() {
     connection.query("SELECT * FROM employee LEFT JOIN role ON employee.role_id = role.id ", function (err, res) {
         if (err) throw err;
         var values = []
-        res.forEach(employee =>{
+        res.forEach(employee => {
             values.push([employee.first_name + " " + employee.last_name, employee.title])
         })
         console.table(['name', 'title'], values)
         inquirer.prompt([
             {
-                type:"list",
-                message:"Would you like to do something else?",
+                type: "list",
+                message: "Would you like to do something else?",
                 name: "restart",
-                choices:[
+                choices: [
                     "Yes",
                     "No"
                 ]
-        }
-        ]).then(a=>{
-            if(a.restart == "Yes"){
+            }
+        ]).then(a => {
+            if (a.restart == "Yes") {
                 init()
             }
-            else{
+            else {
                 connection.end
-            } 
+            }
         })
-})
+    })
 }
 
 //VIEW ROLES
 //same as viewE but need to join role and department
-function viewR(){
-connection.query("SELECT * FROM role LEFT JOIN department ON role.department_id = department.id ", function (err, res) {
-    if (err) throw err;
-    var values = []
-    res.forEach(role =>{
-        values.push([role.title, role.salary, role.name])
+function viewR() {
+    connection.query("SELECT * FROM role LEFT JOIN department ON role.department_id = department.id ", function (err, res) {
+        if (err) throw err;
+        var values = []
+        res.forEach(role => {
+            values.push([role.title, role.salary, role.name])
+        })
+        console.table(['role', 'salary', 'department'], values)
+        inquirer.prompt([
+            {
+                type: "list",
+                message: "Would you like to do something else?",
+                name: "restart",
+                choices: [
+                    "Yes",
+                    "No"
+                ]
+            }
+        ]).then(a => {
+            if (a.restart == "Yes") {
+                init()
+            }
+            else {
+                connection.end
+            }
+        })
     })
-    console.table(['role', 'salary', 'department'], values)
-    inquirer.prompt([
+}
+
+//VIEW DEPARTMENTS
+//just query and console log all the dep names :)
+function viewD() {
+    connection.query("SELECT * FROM department", function (err, res) {
+        if (err) throw err;
+        for(i=0;i<res.length;i++){
+        console.log(res[i].name)}
+        inquirer.prompt([
+            {
+                type: "list",
+                message: "Would you like to do something else?",
+                name: "restart",
+                choices: [
+                    "Yes",
+                    "No"
+                ]
+            }
+        ]).then(a => {
+            if (a.restart == "Yes") {
+                init()
+            }
+            else {
+                connection.end
+            }
+        })
+    })
+}
+
+//UPDATE EMPLOYEE ROLE
+//prompt with choices that are the employees and their role
+//then we need to give prompt with lists of the roles
+function upE() {
+    //query to get the same info as we did from VIEW EMPLOYEE
+    connection.query("SELECT * FROM employee LEFT JOIN role ON employee.role_id = role.id ", function (err, res) {
+        if (err) throw err;
+        inquirer.prompt([
         {
-            type:"list",
-            message:"Would you like to do something else?",
-            name: "restart",
-            choices:[
-                "Yes",
-                "No"
-            ]
-    }
-    ]).then(a=>{
-        if(a.restart == "Yes"){
-            init()
+            type: "rawlist",
+            message: "Which employee would you like to update?",
+            choices: function () {
+                var choiceArray = []
+                for (i = 0; i < res.length; i++) {
+                    choiceArray.push(res[i].first_name + " " + res[i].last_name + ", " + res[i].title)
+                }
+                return choiceArray
+            },
+            name: "role"
+        },
+        {
+            type:"rawlist",
+            message: "What will be their new role?",
+            choices: function(){
+                var choiceArray = []
+                connection.query("SELECT * role", function (err, result) {
+                    if (err) throw err;
+                    for (i = 0; i < result.length; i++) {
+                        choiceArray.push(result[i].title)
+                    }})
+                    return choiceArray
+            },
+            name: "role"
         }
-        else{
-            connection.end
-        } 
+    ]).then(answers=>{
+        console.log(answers)
+
+        inquirer.prompt([
+            {
+                type: "list",
+                message: "Would you like to do something else?",
+                name: "restart",
+                choices: [
+                    "Yes",
+                    "No"
+                ]
+            }
+        ]).then(a => {
+            if (a.restart == "Yes") {
+                init()
+            }
+            else {
+                connection.end
+            }
+        })
     })
-})
+    })
 }
 
 //Start the app!
