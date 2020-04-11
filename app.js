@@ -86,7 +86,7 @@ function init() {
             viewE()
         }
         else if (answer.start == "View roles") {
-
+            viewR()
         }
 
     })
@@ -289,6 +289,55 @@ function viewE(){
             values.push([employee.first_name + " " + employee.last_name, employee.title])
         })
         console.table(['name', 'title'], values)
+        inquirer.prompt([
+            {
+                type:"list",
+                message:"Would you like to do something else?",
+                name: "restart",
+                choices:[
+                    "Yes",
+                    "No"
+                ]
+        }
+        ]).then(a=>{
+            if(a.restart == "Yes"){
+                init()
+            }
+            else{
+                connection.end
+            } 
+        })
+})
+}
+
+//VIEW ROLES
+//same as viewE but need to join role and department
+function viewR(){
+connection.query("SELECT * FROM role LEFT JOIN department ON role.department_id = department.id ", function (err, res) {
+    if (err) throw err;
+    var values = []
+    res.forEach(role =>{
+        values.push([role.title, role.salary, role.name])
+    })
+    console.table(['role', 'salary', 'department'], values)
+    inquirer.prompt([
+        {
+            type:"list",
+            message:"Would you like to do something else?",
+            name: "restart",
+            choices:[
+                "Yes",
+                "No"
+            ]
+    }
+    ]).then(a=>{
+        if(a.restart == "Yes"){
+            init()
+        }
+        else{
+            connection.end
+        } 
+    })
 })
 }
 
