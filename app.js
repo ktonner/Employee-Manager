@@ -50,7 +50,6 @@ function init() {
                     "Add a department",
                     "Add an employee",
                     "Add a role",
-                    "Update a department",
                     "Update an employee",
                     "Update a role",
                     "Update an employee's role",
@@ -71,9 +70,6 @@ function init() {
         else if (answer.start == "Add a role") {
             addR()
         }
-        else if (answer.start == "Update a department") {
-
-        }
         else if (answer.start == "Update an employee") {
 
         }
@@ -87,7 +83,7 @@ function init() {
 
         }
         else if (answer.start == "View employees") {
-
+            viewE()
         }
         else if (answer.start == "View roles") {
 
@@ -282,6 +278,19 @@ function addR() {
             })
         }
 
+//UPDATE EMPLOYEE
+
+//VIEW EMPLOYEES
+function viewE(){
+    connection.query("SELECT * FROM employee LEFT JOIN role ON employee.role_id = role.id ", function (err, res) {
+        if (err) throw err;
+        var values = []
+        res.forEach(employee =>{
+            values.push([employee.first_name + " " + employee.last_name, employee.title])
+        })
+        console.table(['name', 'title'], values)
+})
+}
 
 //Start the app!
 init()
