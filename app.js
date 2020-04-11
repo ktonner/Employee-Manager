@@ -119,11 +119,27 @@ function addD() {
             },
 
             function (err, res) {
-                if (err) throw err;
-                console.log(res.affectedRows + " database updated!\n");
+                if (err) throw err;})
+                inquirer.prompt([
+                    {
+                        type:"list",
+                        message:"Would you like to do something else?",
+                        name: "restart",
+                        choices:[
+                            "Yes",
+                            "No"
+                        ]
+                }
+                ]).then(a=>{
+                    if(a.restart == "Yes"){
+                        init()
+                    }
+                    else{
+                        connection.end
+                    } 
+                })
             })
-    })
-}
+    }
 
 //ADD EMPLOYEE
 //ask for first and last name, then enter role id
@@ -171,12 +187,28 @@ function addE() {
                 },
 
                 function (err, res) {
-                    if (err) throw err;
-                    console.log(res.affectedRows + " database updated!\n");
+                    if (err) throw err;})
+                    inquirer.prompt([
+                        {
+                            type:"list",
+                            message:"Would you like to do something else?",
+                            name: "restart",
+                            choices:[
+                                "Yes",
+                                "No"
+                            ]
+                    }
+                    ]).then(a=>{
+                        if(a.restart == "Yes"){
+                            init()
+                        }
+                        else{
+                            connection.end
+                        } 
+                    })
                 })
         })
-    })
-}
+    }
 
 //ADD ROLE
 //ask for department id, then create role
@@ -226,8 +258,25 @@ function addR() {
 
                         function (err, res) {
                             if (err) throw err;
-                            console.log(res.affectedRows + " database updated!\n");
                         })
+                    inquirer.prompt([
+                        {
+                            type:"list",
+                            message:"Would you like to do something else?",
+                            name: "restart",
+                            choices:[
+                                "Yes",
+                                "No"
+                            ]
+                    }
+                    ]).then(a=>{
+                        if(a.restart == "Yes"){
+                            init()
+                        }
+                        else{
+                            connection.end
+                        } 
+                    })
 
                 })
             })
