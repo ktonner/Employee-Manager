@@ -272,8 +272,6 @@ function addR() {
     })
 }
 
-//UPDATE EMPLOYEE
-
 //VIEW EMPLOYEES
 function viewE() {
     connection.query("SELECT * FROM employee INNER JOIN role ON employee.role_id = role.id ", function (err, res) {
