@@ -276,13 +276,14 @@ function addR() {
 
 //VIEW EMPLOYEES
 function viewE() {
-    connection.query("SELECT * FROM employee LEFT JOIN role ON employee.role_id = role.id ", function (err, res) {
+    connection.query("SELECT * FROM employee INNER JOIN role ON employee.role_id = role.id ", function (err, res) {
         if (err) throw err;
         var values = []
         res.forEach(employee => {
-            values.push([employee.first_name + " " + employee.last_name, employee.title])
+            console.log(res)
+            values.push([employee.first_name + " " + employee.last_name, employee.title, employee.id])
         })
-        console.table(['name', 'title'], values)
+        console.table(['name', 'title', 'id'], values)
         inquirer.prompt([
             {
                 type: "list",
@@ -340,8 +341,9 @@ function viewR() {
 function viewD() {
     connection.query("SELECT * FROM department", function (err, res) {
         if (err) throw err;
-        for(i=0;i<res.length;i++){
-        console.log(res[i].name)}
+        for (i = 0; i < res.length; i++) {
+            console.log(res[i].name)
+        }
         inquirer.prompt([
             {
                 type: "list",
@@ -368,57 +370,74 @@ function viewD() {
 //then we need to give prompt with lists of the roles
 function upE() {
     //query to get the same info as we did from VIEW EMPLOYEE
-    connection.query("SELECT * FROM employee LEFT JOIN role ON employee.role_id = role.id ", function (err, res) {
+    viewEmployees()
+    connection.query("SELECT * FROM role", function (err, res) {
         if (err) throw err;
         inquirer.prompt([
-        {
-            type: "rawlist",
-            message: "Which employee would you like to update?",
-            choices: function () {
-                var choiceArray = []
-                for (i = 0; i < res.length; i++) {
-                    choiceArray.push(res[i].first_name + " " + res[i].last_name + ", " + res[i].title)
-                }
-                return choiceArray
-            },
-            name: "role"
-        },
-        {
-            type:"rawlist",
-            message: "What will be their new role?",
-            choices: function(){
-                var choiceArray = []
-                connection.query("SELECT * role", function (err, result) {
-                    if (err) throw err;
-                    for (i = 0; i < result.length; i++) {
-                        choiceArray.push(result[i].title)
-                    }})
-                    return choiceArray
-            },
-            name: "role"
-        }
-    ]).then(answers=>{
-        console.log(answers)
-
-        inquirer.prompt([
             {
-                type: "list",
-                message: "Would you like to do something else?",
-                name: "restart",
-                choices: [
-                    "Yes",
-                    "No"
-                ]
+                type: "input",
+                message: "Select an employee by their id.",
+                name: "id"
+            },
+            {
+                type: "rawlist",
+                message: "What will be their new role?",
+                choices: function () {
+                    var choiceArray = []
+                        if (err) throw err;
+                        for (i = 0; i < res.length; i++) {
+                            choiceArray.push(res[i].title)
+                        }
+                    return choiceArray
+                },
+                name: "role"
             }
-        ]).then(a => {
-            if (a.restart == "Yes") {
-                init()
+        ]).then(answers => {
+            for (i = 0; i < res.length; i++) {
+                if (answers.role === res[i].title) {
+                    var newRole = res[i].id
+                }
             }
-            else {
-                connection.end
-            }
+            connection.query("UPDATE employee SET ? WHERE ?", [
+                {
+                    role_id: newRole
+                },
+                { 
+                    id: answers.id }
+            ])
+            inquirer.prompt([
+                {
+                    type: "list",
+                    message: "Would you like to do something else?",
+                    name: "restart",
+                    choices: [
+                        "Yes",
+                        "No"
+                    ]
+                }
+            ]).then(a => {
+                if (a.restart == "Yes") {
+                    init()
+                }
+                else {
+                    connection.end
+                }
+            })
         })
     })
+}
+
+//function to view employees
+
+function viewEmployees() {
+    connection.query("SELECT * FROM employee INNER JOIN role ON employee.role_id = role.id ", function (err, res) {
+        if (err) throw err;
+        var values = []
+        res.forEach(employee => {
+            console.log(res)
+            values.push([employee.first_name + " " + employee.last_name, employee.title, employee.id])
+        })
+        console.table(['name', 'title', 'id'], values)
     })
 }
 
